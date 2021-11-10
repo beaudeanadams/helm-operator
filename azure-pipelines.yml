@@ -27,20 +27,25 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
-    - task: Docker@2
+    - task: Bash@3
       inputs:
-        containerRegistry: '$(containerRegistryConnection)'
-        command: 'login'
-    - task: CmdLine@2
-      displayName: Build
-      inputs:
+        targetType: 'inline'
         script: |
-          docker run --privileged --rm tonistiigi/binfmt --install arm64
-          docker run --privileged --rm tonistiigi/binfmt
-          docker buildx create --use
-          docker buildx build --platform linux/amd64,linux/arm64 \
-            -t $(containerRegistry)/$(imageRepository):$(tag)\
-            -t $(containerRegistry)/$(imageRepository):latest \
-            --push \
-            -f $(dockerFilePath) \
-            .
+          make ARCH=arm64
+    # - task: Docker@2
+    #   inputs:
+    #     containerRegistry: '$(containerRegistryConnection)'
+    #     command: 'login'
+    # - task: CmdLine@2
+    #   displayName: Build
+    #   inputs:
+    #     script: |
+    #       docker run --privileged --rm tonistiigi/binfmt --install arm64
+    #       docker run --privileged --rm tonistiigi/binfmt
+    #       docker buildx create --use
+    #       docker buildx build --platform linux/amd64,linux/arm64 \
+    #         -t $(containerRegistry)/$(imageRepository):$(tag)\
+    #         -t $(containerRegistry)/$(imageRepository):latest \
+    #         --push \
+    #         -f $(dockerFilePath) \
+    #         .
